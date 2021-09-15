@@ -138,7 +138,7 @@ criterion_params:
 criterion_train: BCEWithLogitsLoss
 criterion_val: BCEWithLogitsLoss
 cv_schema: RepeatedStratifiedGroupKFold
-debug: false
+debug: true
 device: cuda
 group_kfold_split: PatientID
 image_col_name: StudyInstanceUID
@@ -147,7 +147,7 @@ iters_to_accumulate: 4
 model_factory: timm
 model_name: resnet200d
 monitored_result: multi_class_roc_auc_score
-n_epochs: 10
+n_epochs: 1
 num_classes: 11
 num_folds: 5
 num_workers: 0

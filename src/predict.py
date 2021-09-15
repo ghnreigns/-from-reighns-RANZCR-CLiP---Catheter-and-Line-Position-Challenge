@@ -135,31 +135,50 @@ def LoadTestSet(test_df: pd.DataFrame, config):
     )
     # dataset = torch.utils.data.TensorDataset(test_dataset, tta_test_dataset)
     test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=config.val_batch_size, shuffle=False, num_workers=4
+        test_dataset,
+        batch_size=config.val_batch_size,
+        shuffle=False,
+        num_workers=config.num_workers,
     )
     tta_test_loader = torch.utils.data.DataLoader(
-        tta_test_dataset, batch_size=config.val_batch_size, shuffle=False, num_workers=4
+        tta_test_dataset,
+        batch_size=config.val_batch_size,
+        shuffle=False,
+        num_workers=config.num_workers,
     )
 
     # dataloader = torch.utils.data.DataLoader(
     #     dataset, batch_size=config.val_batch_size, shuffle=False
     # )
 
+    ## Colab ##
+
+    # state_dicts = [
+    #     torch.load(checkpoint_path, map_location=torch.device("cuda"))
+    #     for checkpoint_path in glob.glob(
+    #         "/content/drive/My Drive/RANZCR/weights/resnet200D/17th-Mar-V1/*.pt"
+    #     )
+    # ]
+
     state_dicts = [
         torch.load(checkpoint_path, map_location=torch.device("cuda"))
-        for checkpoint_path in glob.glob(
-            "/content/drive/My Drive/RANZCR/weights/resnet200D/17th-Mar-V1/*.pt"
-        )
+        for checkpoint_path in glob.glob("./stored_models/*.pt")
     ]
+    predictions = inference_by_fold(config, model, state_dicts, test_loader)
 
-    predictions = inference_tta_by_fold(
-        config=config,
-        model=model,
-        states_dicts=state_dicts,
-        test_loader=test_loader,
-        tta_test_loader=tta_test_loader,
-    )
-    sample_submission = pd.read_csv("/content/train/sample_submission.csv")
+    # TTA #
+    # predictions = inference_tta_by_fold(
+    #     config=config,
+    #     model=model,
+    #     states_dicts=state_dicts,
+    #     test_loader=test_loader,
+    #     tta_test_loader=tta_test_loader,
+    # )
+
+    # colab
+    # sample_submission = pd.read_csv("/content/train/sample_submission.csv")
+
+    sample_submission = pd.read_csv("./data/sample_submission.csv")
     sample_submission[config.class_col_name] = predictions
     sample_submission.to_csv("17Marchresnet200DV1.csv", index=False)
 
@@ -167,12 +186,13 @@ def LoadTestSet(test_df: pd.DataFrame, config):
 if __name__ == "__main__":
 
     CURRENT_MODEL = "resnet200d"
-    MODELS = {
-        "resnet200d": "/content/reighns/config_RANZCR_resnet200d.yaml",
-    }
+    yaml_config = YAMLConfig("./config/config_RANZCR_resnet200d.yaml")
+    # MODELS = {
+    #     "resnet200d": "/content/reighns/config_RANZCR_resnet200d.yaml",
+    # }
 
-    yaml_config = YAMLConfig(MODELS[CURRENT_MODEL])
+    # yaml_config = YAMLConfig(MODELS[CURRENT_MODEL])
 
     seed_all(seed=yaml_config.seed)
-    df_test = pd.read_csv("/content/train/sample_submission.csv")
+    df_test = pd.read_csv("./data/sample_submission.csv")
     LoadTestSet(df_test, yaml_config)

@@ -149,6 +149,8 @@ class CustomModel(torch.nn.Module):
 
     def forward(self, input_neurons):
         """Define the computation performed at every call."""
+        # TODO: rename output_predictions to output_logits
+
         if self.use_custom_layers is False:
             output_predictions = self.model(input_neurons)
         else:
@@ -158,7 +160,25 @@ class CustomModel(torch.nn.Module):
                     getattr(self, f"head_{i}")(output_logits_backbone)
                     for i in range(self.num_heads)
                 ]
+
+                ### Debug Testing ###
+                # If batch size is 8, then head_1 should have shape of (8, 3) etc
+                (
+                    head_1_output_logits,
+                    head_2_output_logits,
+                    head_3_output_logits,
+                    head_4_output_logits,
+                ) = multi_outputs
+                assert head_1_output_logits.shape[1] == 3
+                assert head_2_output_logits.shape[1] == 4
+                assert head_3_output_logits.shape[1] == 3
+                assert head_4_output_logits.shape[1] == 1
+
+                # Concatenate all 4 heads to form shape (BS, 11) where BS = batch_size
                 output_predictions = torch.cat(multi_outputs, axis=1)
+                assert output_predictions.shape[1] == 11
+                # print(output_predictions)
+
             else:  # only single head
                 output_logits_backbone = self.architecture["backbone"](input_neurons)
                 output_predictions = self.architecture["head"](output_logits_backbone)
