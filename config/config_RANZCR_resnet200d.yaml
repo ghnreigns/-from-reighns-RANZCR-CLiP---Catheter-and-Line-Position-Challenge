@@ -1,0 +1,226 @@
+augmentations_class: AlbumentationsAugmentation
+augmentations_train:
+  AlbumentationsAugmentation:
+  - name: RandomResizedCrop
+    params:
+      height: 640
+      p: 1.0
+      scale:
+      - 0.9
+      - 1.0
+      width: 640
+  - name: HorizontalFlip
+    params:
+      p: 0.5
+  - name: ShiftScaleRotate
+    params:
+      border_mode: 0
+      mask_value: 0
+      p: 0.5
+      rotate_limit: 20
+      scale_limit: 0.2
+      shift_limit: 0.2
+      value: 0
+  - name: HueSaturationValue
+    params:
+      hue_shift_limit: 10
+      p: 0.7
+      sat_shift_limit: 10
+      val_shift_limit: 10
+  - name: RandomBrightnessContrast
+    params:
+      brightness_limit:
+      - -0.2
+      - 0.2
+      contrast_limit:
+      - -0.2
+      - 0.2
+      p: 0.7
+  - name: CLAHE
+    params:
+      clip_limit:
+      - 1
+      - 4
+      p: 0.5
+  - name: JpegCompression
+    params:
+      p: 0.2
+  - name: IAAPiecewiseAffine
+    params:
+      p: 0.2
+  - name: IAASharpen
+    params:
+      p: 0.2
+  - name: Cutout
+    params:
+      max_h_size: 64
+      max_w_size: 64
+      num_holes: 5
+      p: 0.5
+  - name: Resize
+    params:
+      height: 640
+      p: 1.0
+      width: 640
+  - name: Normalize
+    params:
+      mean:
+      - 0.4887381077884414
+      p: 1.0
+      std:
+      - 0.23064819430546407
+  - name: ToTensorV2
+    params:
+      p: 1.0
+augmentations_val:
+  AlbumentationsAugmentation:
+  - name: Resize
+    params:
+      height: 640
+      p: 1.0
+      width: 640
+  - name: Normalize
+    params:
+      mean:
+      - 0.4887381077884414
+      p: 1.0
+      std:
+      - 0.23064819430546407
+  - name: ToTensorV2
+    params:
+      p: 1.0
+class_col_name:
+- ETT - Abnormal
+- ETT - Borderline
+- ETT - Normal
+- NGT - Abnormal
+- NGT - Borderline
+- NGT - Incompletely Imaged
+- NGT - Normal
+- CVC - Abnormal
+- CVC - Borderline
+- CVC - Normal
+- Swan Ganz Catheter Present
+class_list:
+- 0
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+- 8
+- 9
+- 10
+classification_type: MultiLabel
+criterion_params:
+  BCEWithLogitsLoss:
+    pos_weight: null
+    reduce: null
+    reduction: mean
+    size_average: null
+    weight: null
+  CrossEntropyLoss:
+    ignore_index: -100
+    reduce: null
+    reduction: mean
+    size_average: null
+    weight: null
+  FocalCosineLoss:
+    alpha: 1
+    gamma: 2
+    xent: 0.1
+  LabelSmoothingLoss:
+    classes: 2
+    dim: -1
+    smoothing: 0.05
+criterion_train: BCEWithLogitsLoss
+criterion_val: BCEWithLogitsLoss
+cv_schema: RepeatedStratifiedGroupKFold
+debug: false
+device: cuda
+group_kfold_split: PatientID
+image_col_name: StudyInstanceUID
+image_size: 320
+iters_to_accumulate: 4
+model_factory: timm
+model_name: resnet200d
+monitored_result: multi_class_roc_auc_score
+n_epochs: 10
+num_classes: 11
+num_folds: 5
+num_workers: 0
+optimizer: Adam
+optimizer_params:
+  Adam:
+    amsgrad: false
+    betas:
+    - 0.9
+    - 0.999
+    eps: 1.0e-07
+    lr: 2.0e-05
+    weight_decay: 0
+  AdamW:
+    amsgrad: false
+    betas:
+    - 0.9
+    - 0.999
+    eps: 1.0e-08
+    lr: 2.0e-05
+    weight_decay: 0.001
+paths:
+  csv_path: ./data/df_folds.csv
+  custom_pretrained_weight: ./data/pretrained_weights/resnet200d_320_chestx.pth
+  log_path: ./stored_models/log.txt
+  model_weight_path_folder: /content/drive/My Drive/pretrained-weights/pretrained-resnet200D-weights
+  save_path: ./stored_models/
+  test_path: ./data/test
+  train_path: ./data/train
+result_params:
+  average_loss: {}
+  multi_class_roc_auc_score: {}
+  val_preds_softmax_array: {}
+results_train:
+- average_loss
+results_val:
+- average_loss
+- val_preds_softmax_array
+- multi_class_roc_auc_score
+scheduler: CosineAnnealingLR
+scheduler_params:
+  CosineAnnealingLR:
+    T_max: 16
+    eta_min: 1.0e-07
+    last_epoch: -1
+    verbose: true
+  CosineAnnealingWarmRestarts:
+    T_0: 16
+    T_mult: 1
+    eta_min: 0
+    last_epoch: -1
+    verbose: true
+  ReduceLROnPlateau:
+    cooldown: 0
+    eps: 1.0e-08
+    factor: 0.7
+    min_lr: 1.0e-05
+    mode: max
+    patience: 2
+    threshold: 0.01
+    threshold_mode: rel
+    verbose: true
+  StepLR:
+    gamma: 0.3
+    last_epoch: -1
+    step_size: 2
+    verbose: true
+seed: 1992
+train_batch_size: 8
+train_step_scheduler: false
+use_amp: true
+use_grad_accum: true
+val_batch_size: 8
+val_step_scheduler: false
+verbose: 1
+verbose_step: 1
