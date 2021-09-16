@@ -12,6 +12,73 @@ jupyter:
     name: python3
 ---
 
+```python _uuid="8f2839f25d086af736a60e9eeb907d3b93b6e0e5" _cell_guid="b1076dfc-b9ad-4769-8c92-a6c4dae69d19"
+import numpy as np 
+import pandas as pd 
+import os
+from sklearn.cluster import KMeans
+from tqdm import tqdm
+from sklearn.preprocessing import LabelEncoder
+from collections import Counter, defaultdict
+from sklearn.utils import check_random_state
+import torch
+import os
+import random
+```
+
+```python
+def seed_all(seed: int = 1930):
+    """Seed all random number generators."""
+    print("Using Seed Number {}".format(seed))
+
+    os.environ["PYTHONHASHSEED"] = str(
+        seed
+    )  # set PYTHONHASHSEED env var at fixed value
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.cuda.manual_seed(seed)  # pytorch (both CPU and CUDA)
+    np.random.seed(seed)  # for numpy pseudo-random generator
+    random.seed(seed)  # set fixed value for python built-in pseudo-random generator
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.enabled = False
+
+
+def seed_worker(_worker_id):
+    """Seed a worker with the given ID."""
+    worker_seed = torch.initial_seed() % 2 ** 32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+seed_all(20201213)
+```
+
+[Reading](https://debuggercafe.com/multi-head-deep-learning-models-for-multi-label-classification/)
+
+[AUC Metric on Multi-Label](https://towardsdatascience.com/journey-to-the-center-of-multi-label-classification-384c40229bff)
+
+[Sigmoid and Softmax for Multi-Label](https://glassboxmedicine.com/2019/05/26/classification-sigmoid-vs-softmax/)
+
+[Reading](https://towardsdatascience.com/journey-to-the-center-of-multi-label-classification-384c40229bff)
+
+- [Why we should use Multi-Head in Multi-Label Classification](https://debuggercafe.com/multi-head-deep-learning-models-for-multi-label-classification/)
+    - [Follow Up 1](https://debuggercafe.com/multi-label-image-classification-with-pytorch-and-deep-learning/)
+    - [Follow Up 2](https://debuggercafe.com/multi-label-fashion-item-classification-using-deep-learning-and-pytorch/)
+    - [Follow Up 3](https://debuggercafe.com/deep-learning-architectures-for-multi-label-classification-using-pytorch/)
+
+[Sigmoid is Binary Cross Entropy](https://stats.stackexchange.com/questions/485551/1-neuron-bce-loss-vs-2-neurons-ce-loss)
+
+[Attention Blocks in Computer Vision](https://towardsdatascience.com/attention-in-computer-vision-fd289a5bd7ad)
+
+[Spatial Attention Blocks](https://medium.com/visionwizard/understanding-attention-modules-cbam-and-bam-a-quick-read-ca8678d1c671)
+
+[Spatial Attention Module](https://paperswithcode.com/method/spatial-attention-module)
+
+[Convolutional Block Attention Module](https://arxiv.org/abs/1807.06521)
+
+[Dive Into Deep Learning - Chapter 10: Attention Mechanisms]
+
+
 # Introduction
 
 > Extracted from Kaggle 
@@ -77,6 +144,11 @@ We used a few models and found out that `resnet200d` has the best results on thi
 # Preprocessing
 
 Most preprocessing techniques we do in an image recognition competition is mostly as follows:
+
+
+
+
+
 
 ## Mean and Standard Deviation
 
@@ -268,9 +340,9 @@ This is a multi-label classification problem. The section on the activation func
 
 <!-- #endregion -->
 
-| Single-Head Approach                                                     | Multi-Head Approach                                                      |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| ![alt](https://drive.google.com/uc?id=12AUYKXSH3bb3ENxqbsMjCVDYHvNqcQa9) | ![alt](https://drive.google.com/uc?id=1278TVxrLF8ce-maOGFiJaubMS9lQGgL4) |
+Single-Head Approach | Multi-Head Approach
+- | - 
+ ![alt](https://drive.google.com/uc?id=12AUYKXSH3bb3ENxqbsMjCVDYHvNqcQa9) | ![alt](https://drive.google.com/uc?id=1278TVxrLF8ce-maOGFiJaubMS9lQGgL4)
 courtesy of Tawara
 
 <!-- #region -->
@@ -404,29 +476,6 @@ What we could have done better:
 - Knowledge Distillation.
 - Experiment more on maximizing AUC during ensembles. `rank_pct` etc.
 
-# References
+```python
 
-- [Reading](https://debuggercafe.com/multi-head-deep-learning-models-for-multi-label-classification/)
-
-- [AUC Metric on Multi-Label](https://towardsdatascience.com/journey-to-the-center-of-multi-label-classification-384c40229bff)
-
-- [Sigmoid and Softmax for Multi-Label](https://glassboxmedicine.com/2019/05/26/classification-sigmoid-vs-softmax/)
-
-- [Reading](https://towardsdatascience.com/journey-to-the-center-of-multi-label-classification-384c40229bff)
-
-- [Why we should use Multi-Head in Multi-Label Classification](https://debuggercafe.com/multi-head-deep-learning-models-for-multi-label-classification/)
-    - [Follow Up 1](https://debuggercafe.com/multi-label-image-classification-with-pytorch-and-deep-learning/)
-    - [Follow Up 2](https://debuggercafe.com/multi-label-fashion-item-classification-using-deep-learning-and-pytorch/)
-    - [Follow Up 3](https://debuggercafe.com/deep-learning-architectures-for-multi-label-classification-using-pytorch/)
-
-- [Sigmoid is Binary Cross Entropy](https://stats.stackexchange.com/questions/485551/1-neuron-bce-loss-vs-2-neurons-ce-loss)
-
-- [Attention Blocks in Computer Vision](https://towardsdatascience.com/attention-in-computer-vision-fd289a5bd7ad)
-
-- [Spatial Attention Blocks](https://medium.com/visionwizard/understanding-attention-modules-cbam-and-bam-a-quick-read-ca8678d1c671)
-
-- [Spatial Attention Module](https://paperswithcode.com/method/spatial-attention-module)
-
-- [Convolutional Block Attention Module](https://arxiv.org/abs/1807.06521)
-
-- [Dive Into Deep Learning - Chapter 10: Attention Mechanisms]
+```
