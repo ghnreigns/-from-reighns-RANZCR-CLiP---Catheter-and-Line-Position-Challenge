@@ -38,9 +38,7 @@ class Conv2dBNActiv(torch.nn.Module):
         super(Conv2dBNActiv, self).__init__()
         layers = []
         layers.append(
-            torch.nn.Conv2d(
-                in_channels, out_channels, kernel_size, stride, padding, bias=bias
-            )
+            torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias)
         )
         if use_bn:
             layers.append(torch.nn.BatchNorm2d(out_channels))
