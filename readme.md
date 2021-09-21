@@ -341,10 +341,26 @@ We used both `torch.amp` and `gradient accumulation` to be able to fit more batc
 
 ## Optimizer, Scheduler and Loss
 
-Nothing too fancy here, although we really wanted to try out `Focal Loss` in this setting. The configuration can be seen here. But note that we incorporated `GradualWarmUpScheduler` along with `CosineAnnealingLR`.
+### Scheduler
 
+The configuration can be seen here. But note that we incorporated `GradualWarmUpScheduler` along with `CosineAnnealingLR`.
+
+From the paper [Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour](https://arxiv.org/abs/1706.02677), we learnt about the warmup technique. Although the context of the paper was training under large batch size, we find it helpful even in small batches for the training to converge. 
+
+The basic algorithm is as follows:
+
+1. scheduler_cosine_annealing_warm_restart: Dict = {"T_0": 200,
+                                                 "T_mult": 1,
+                                                 "eta_min": 0.001,
+                                                 "last_epoch": -1,
+                                                 "verbose": False}
 However, I took quite some time to understand the idea of gradual warmup, I made my understanding [here](https://github.com/reigHns/reighns-pytorch-gradual-warmup-scheduler/blob/master/src/run.py).
 
+We should try `OneCyclePolicy` as detailed by fastai.
+
+### Loss
+
+We should also experiment with `Focal Loss` but seeing negative results from fellow Kagglers, on top with limited resources, we did not try it.
 
 # Ensembling
 
@@ -406,13 +422,13 @@ What we could have done better:
 
 # References
 
-- [Reading](https://debuggercafe.com/multi-head-deep-learning-models-for-multi-label-classification/)
+- [Multi-Head Deep Learning Model with Multi-Label Classification](https://debuggercafe.com/multi-head-deep-learning-models-for-multi-label-classification/)
 
 - [AUC Metric on Multi-Label](https://towardsdatascience.com/journey-to-the-center-of-multi-label-classification-384c40229bff)
 
 - [Sigmoid and Softmax for Multi-Label](https://glassboxmedicine.com/2019/05/26/classification-sigmoid-vs-softmax/)
 
-- [Reading](https://towardsdatascience.com/journey-to-the-center-of-multi-label-classification-384c40229bff)
+- [Multi-Label Classification Tutorial](https://towardsdatascience.com/journey-to-the-center-of-multi-label-classification-384c40229bff)
 
 - [Why we should use Multi-Head in Multi-Label Classification](https://debuggercafe.com/multi-head-deep-learning-models-for-multi-label-classification/)
     - [Follow Up 1](https://debuggercafe.com/multi-label-image-classification-with-pytorch-and-deep-learning/)
@@ -430,3 +446,5 @@ What we could have done better:
 - [Convolutional Block Attention Module](https://arxiv.org/abs/1807.06521)
 
 - [Dive Into Deep Learning - Chapter 10: Attention Mechanisms]
+
+- [Gradual Warmup: Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour](https://arxiv.org/abs/1706.02677)
